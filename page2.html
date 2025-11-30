@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 изображений - Страница 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow-x: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .image-container {
+            width: 100vw;
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <img src="1a.png" alt="Изображение 1a" onclick="navigateToPage('index.html')">
+        <img src="2a.png" alt="Изображение 2a">
+        <img src="3a.png" alt="Изображение 3a">
+        <img src="4a.png" alt="Изображение 4a">
+        <img src="5a.png" alt="Изображение 5a">
+    </div>
+
+    <script>
+        function navigateToPage(url) {
+            document.body.classList.remove('loaded');
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            
+            setTimeout(function() {
+                window.location.href = url;
+            }, 500);
+        }
+
+        // Анимация появления при загрузке страницы
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.body.classList.add('loaded');
+            }, 50);
+        });
+    </script>
+</body>
+</html>
