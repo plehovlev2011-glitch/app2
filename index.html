@@ -32,16 +32,21 @@
             height: auto;
             display: block;
             cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         
         .clickable {
             cursor: pointer;
         }
+        
+        #first-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
     </style>
 </head>
 <body>
     <div class="image-container">
-        <img src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
+        <img id="first-image" src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
         <img src="2.png" alt="Изображение 2">
         <img src="3.png" alt="Изображение 3">
         <img src="4.png" alt="Изображение 4">
@@ -66,6 +71,16 @@
                 document.body.style.opacity = '1';
                 document.body.style.transform = 'translateY(0)';
             }, 50);
+        });
+
+        // Тактильная отдача для первого изображения
+        const firstImage = document.getElementById('first-image');
+        firstImage.addEventListener('touchstart', function() {
+            this.style.transform = 'translateY(4px) scale(0.98)';
+        });
+        
+        firstImage.addEventListener('touchend', function() {
+            this.style.transform = 'translateY(0) scale(1)';
         });
     </script>
 </body>
