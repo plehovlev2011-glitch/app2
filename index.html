@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5 изображений</title>
+    <script>
+        if (!localStorage.getItem('hasSeenWelcome')) {
+            window.location.href = 'welcome.html';
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -16,6 +21,7 @@
             opacity: 1;
             transform: translateY(0);
             transition: opacity 0.5s ease, transform 0.5s ease;
+            background: #000;
         }
         
         body.fade-out {
@@ -25,6 +31,7 @@
         
         .image-container {
             width: 100vw;
+            background: #000;
         }
         
         .image-container img {
@@ -61,7 +68,6 @@
             }, 500);
         }
 
-        // Анимация появления при загрузке страницы
         window.addEventListener('load', function() {
             document.body.style.opacity = '0';
             document.body.style.transform = 'translateY(20px)';
@@ -73,7 +79,6 @@
             }, 50);
         });
 
-        // Тактильная отдача для первого изображения
         const firstImage = document.getElementById('first-image');
         firstImage.addEventListener('touchstart', function() {
             this.style.transform = 'translateY(4px) scale(0.98)';
