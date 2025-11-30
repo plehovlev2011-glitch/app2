@@ -27,15 +27,15 @@
         }
         
         .welcome-container {
-            width: 300vw; /* 3 слайда по 100vw */
+            width: 300vw;
             height: 100vh;
             display: flex;
-            flex-direction: row; /* Изменено с column на row */
+            flex-direction: row;
             transition: transform 0.4s ease;
         }
         
         .welcome-slide {
-            width: 100vw; /* Каждый слайд занимает 100% ширины viewport */
+            width: 100vw;
             height: 100vh;
             flex-shrink: 0;
             display: flex;
@@ -45,9 +45,9 @@
         }
         
         .welcome-slide img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .slide-indicator {
@@ -117,7 +117,6 @@
     <button class="next-button" id="nextButton">ОКЕЙ</button>
 
     <script>
-        // Проверяем, был ли пользователь уже здесь
         if (localStorage.getItem('hasSeenWelcome')) {
             window.location.href = 'index.html';
         }
@@ -128,24 +127,20 @@
         const nextButton = document.getElementById('nextButton');
         const indicatorDots = document.querySelectorAll('.indicator-dot');
 
-        // Анимация появления
         window.addEventListener('load', function() {
             setTimeout(function() {
                 document.body.classList.add('loaded');
             }, 50);
         });
 
-        // Функция переключения слайдов
         function goToSlide(slideIndex) {
             currentSlide = slideIndex;
             welcomeContainer.style.transform = `translateX(-${slideIndex * 100}vw)`;
             
-            // Обновляем индикаторы
             indicatorDots.forEach((dot, index) => {
                 dot.classList.toggle('active', index === slideIndex);
             });
             
-            // Обновляем текст кнопки
             if (slideIndex === totalSlides - 1) {
                 nextButton.textContent = 'ПОГНАЛИ';
             } else {
@@ -153,17 +148,14 @@
             }
         }
 
-        // Обработчик кнопки
         nextButton.addEventListener('click', function() {
             if (currentSlide < totalSlides - 1) {
                 goToSlide(currentSlide + 1);
             } else {
-                // Завершаем приветствие
                 completeWelcome();
             }
         });
 
-        // Swipe для мобильных устройств
         let startX = 0;
         let currentX = 0;
 
@@ -187,7 +179,6 @@
             }
         });
 
-        // Завершение приветствия
         function completeWelcome() {
             localStorage.setItem('hasSeenWelcome', 'true');
             
