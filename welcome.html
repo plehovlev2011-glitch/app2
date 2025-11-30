@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добро пожаловать!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -17,6 +18,7 @@
             transform: translateY(20px);
             transition: opacity 0.5s ease, transform 0.5s ease;
             background: #000;
+            font-family: 'Ubuntu Mono', monospace;
         }
         
         body.loaded {
@@ -50,8 +52,7 @@
         .slide-indicator {
             position: fixed;
             bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 20px;
             display: flex;
             gap: 10px;
             z-index: 100;
@@ -79,10 +80,12 @@
             border: none;
             border-radius: 35px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
+            font-family: 'Ubuntu Mono', monospace;
             transition: transform 0.2s ease, background 0.3s ease;
             box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+            letter-spacing: 0.5px;
         }
         
         .next-button:active {
