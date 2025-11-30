@@ -27,15 +27,16 @@
         }
         
         .welcome-container {
-            width: 100vw;
+            width: 300vw; /* 3 слайда по 100vw */
             height: 100vh;
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Изменено с column на row */
+            transition: transform 0.4s ease;
         }
         
         .welcome-slide {
-            width: 100%;
-            height: 100%;
+            width: 100vw; /* Каждый слайд занимает 100% ширины viewport */
+            height: 100vh;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -44,8 +45,8 @@
         }
         
         .welcome-slide img {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 90%;
+            max-height: 90%;
             object-fit: contain;
         }
         
