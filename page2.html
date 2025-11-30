@@ -13,18 +13,44 @@
         
         body {
             overflow-x: hidden;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            background: #000;
         }
         
-        body.loaded {
-            opacity: 1;
-            transform: translateY(0);
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader-gif {
+            width: 80px;
+            height: 80px;
         }
         
         .image-container {
             width: 100vw;
+            background: #000;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .image-container.loaded {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .image-container img {
@@ -41,7 +67,13 @@
     </style>
 </head>
 <body>
-    <div class="image-container">
+    <!-- Прелоадер -->
+    <div class="preloader" id="preloader">
+        <img src="loadgif.gif" alt="Загрузка" class="loader-gif">
+    </div>
+
+    <!-- Основной контент -->
+    <div class="image-container" id="imageContainer">
         <img id="first-image" src="1a.png" alt="Изображение 1a" onclick="navigateToPage('index.html')">
         <img src="2a.png" alt="Изображение 2a">
         <img src="3a.png" alt="Изображение 3a">
@@ -50,24 +82,51 @@
     </div>
 
     <script>
+        // Ждем загрузки всех изображений
+        window.addEventListener('load', function() {
+            const images = document.querySelectorAll('.image-container img');
+            const totalImages = images.length;
+            let loadedImages = 0;
+            const preloader = document.getElementById('preloader');
+            const imageContainer = document.getElementById('imageContainer');
+
+            function imageLoaded() {
+                loadedImages++;
+                if (loadedImages === totalImages) {
+                    setTimeout(function() {
+                        preloader.classList.add('hidden');
+                        imageContainer.classList.add('loaded');
+                    }, 300);
+                }
+            }
+
+            images.forEach(img => {
+                if (img.complete) {
+                    imageLoaded();
+                } else {
+                    img.addEventListener('load', imageLoaded);
+                    img.addEventListener('error', imageLoaded);
+                }
+            });
+
+            if (loadedImages === totalImages) {
+                setTimeout(function() {
+                    preloader.classList.add('hidden');
+                    imageContainer.classList.add('loaded');
+                }, 300);
+            }
+        });
+
         function navigateToPage(url) {
-            document.body.classList.remove('loaded');
             document.body.style.opacity = '0';
             document.body.style.transform = 'translateY(-20px)';
+            document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             
             setTimeout(function() {
                 window.location.href = url;
             }, 500);
         }
 
-        // Анимация появления при загрузке страницы
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.body.classList.add('loaded');
-            }, 50);
-        });
-
-        // Тактильная отдача для первого изображения
         const firstImage = document.getElementById('first-image');
         firstImage.addEventListener('touchstart', function() {
             this.style.transform = 'translateY(4px) scale(0.98)';
