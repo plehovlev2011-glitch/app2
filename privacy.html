@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конфиденциальность</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Ubuntu Mono', monospace;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .privacy-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .privacy-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: left;
+            color: #ff4444;
+        }
+        
+        .privacy-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #111;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #fff;
+        }
+        
+        .section-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .highlight {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        
+        .action-button {
+            width: 100%;
+            padding: 18px 30px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 35px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            font-family: 'Ubuntu Mono', monospace;
+            transition: transform 0.2s ease, background 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .action-button:active {
+            transform: scale(0.95);
+            background: #ff3333;
+        }
+        
+        .secondary-button {
+            background: #333;
+        }
+        
+        .secondary-button:active {
+            background: #444;
+        }
+        
+        .info-note {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 30px;
+            text-align: center;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-container">
+        <div class="privacy-title">
+            МЫ ПЕРЕСМОТРЕЛИ ПОДХОД К КОНФИДЕНЦИАЛЬНОСТИ
+        </div>
+        
+        <div class="privacy-section">
+            <div class="section-title">ЧТО ИЗМЕНИЛОСЬ</div>
+            <div class="section-text">
+                Кафе-столовая <span class="highlight">"ПЕРЕЦ"</span> больше не нуждается в твоём имени, дате рождения и тем более номере телефона. 
+                Мы убрали все поля для ввода личных данных, потому что поняли — тебе не обязательно ими делиться.
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <div class="section-title">КАК ЭТО РАБОТАЕТ</div>
+            <div class="section-text">
+                Приложение работает <span class="highlight">без аккаунта</span>. Никакой регистрации, никаких паролей. 
+                Просто открывай и пользуйся. Все функции доступны сразу.
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <div class="section-title">ЦИФРОВОЙ СЛЕД</div>
+            <div class="section-text">
+                Мы добавили новое меню — <span class="highlight">"ЦИФРОВОЙ СЛЕД"</span>. Здесь ты можешь увидеть, 
+                какие данные о твоём устройстве сохраняются (только техническая информация).
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <div class="section-title">ПОЛНЫЙ КОНТРОЛЬ</div>
+            <div class="section-text">
+                Если не хочешь, чтобы данные о телефоне оставались в приложении — просто зайди в "Цифровой след" 
+                и нажми <span class="highlight">"ОЧИСТИТЬ ИСТОРИЮ"</span>. Все технические данные будут удалены.
+            </div>
+        </div>
+        
+        <div class="privacy-section">
+            <div class="section-title">НАШ ПРИНЦИП</div>
+            <div class="section-text">
+                Мы верим, что хороший сервис не требует твоих личных данных. Ты приходишь к нам поесть, 
+                а не заполнять анкеты. Простота и уважение к твоей приватности — наш главный приоритет.
+            </div>
+        </div>
+        
+        <div class="buttons-container">
+            <button class="action-button secondary-button" onclick="navigateToPage('pageR1.html')">
+                ПОСМОТРЕТЬ ЦИФРОВОЙ СЛЕД
+            </button>
+            <button class="action-button" onclick="navigateToPage('index.html')">
+                НА ГЛАВНУЮ
+            </button>
+        </div>
+        
+        <div class="info-note">
+            Обновлено: 2024 • Кафе-столовая "ПЕРЕЦ"
+        </div>
+    </div>
+
+    <script>
+        // Функция перехода на другую страницу
+        function navigateToPage(url) {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(function() {
+                window.location.href = url;
+            }, 500);
+        }
+
+        // Анимация появления
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(20px)';
+            
+            setTimeout(function() {
+                document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                document.body.style.opacity = '1';
+                document.body.style.transform = 'translateY(0)';
+            }, 50);
+        });
+
+        // Тактильная отдача для кнопок
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.style.transform = 'translateY(4px) scale(0.98)';
+            });
+            
+            button.addEventListener('touchend', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
