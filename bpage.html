@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Специальная страница</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow-x: hidden;
+            background: #000;
+        }
+        
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader-gif {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .image-container {
+            width: 100vw;
+            background: #000;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .image-container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+        }
+        
+        #bar1-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
+        
+        #bar2-image {
+            cursor: pointer;
+        }
+        
+        #bar2-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
+        
+        #bar3-image {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .swipe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 68, 68, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .swipe-overlay.active {
+            opacity: 1;
+        }
+        
+        .swipe-arrow {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            opacity: 0.8;
+        }
+        
+        .swipe-text {
+            color: #ff4444;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .hidden-image {
+            opacity: 0;
+            pointer-events: none;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .swipe-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,68,68,0.3) 0%, rgba(255,68,68,0) 100%);
+            transition: width 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Прелоадер -->
+    <div class="preloader" id="preloader">
+        <img src="loadgif.gif" alt="Загрузка" class="loader-gif">
+    </div>
+
+    <!-- Основной контент -->
+    <div class="image-container" id="imageContainer">
+        <img id="bar1-image" src="aBar1.png" alt="Bar 1">
+        <img id="bar2-image" src="aBar2.png" alt="Bar 2">
+        <div id="bar3-container">
+            <img id="bar3-image" src="aBar3.png" alt="Bar 3">
+            <div class="swipe-overlay" id="swipeOverlay">
+                <div class="swipe-indicator" id="swipeIndicator"></div>
+                <svg class="swipe-arrow" viewBox="0 0 24 24" fill="#ff4444">
+                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                </svg>
+                <div class="swipe-text">СВАЙП →</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Проверяем, была ли скрыта aBar2.png
+        const isBar2Hidden = localStorage.getItem('bar2Hidden') === 'true';
+        
+        // Ждем загрузки всех изображений
+        window.addEventListener('load', function() {
+            const images = document.querySelectorAll('.image-container img');
+            const totalImages = images.length;
+            let loadedImages = 0;
+            const preloader = document.getElementById('preloader');
+            const imageContainer = document.getElementById('imageContainer');
+            const bar2Image = document.getElementById('bar2-image');
+            const swipeOverlay = document.getElementById('swipeOverlay');
+
+            function imageLoaded() {
+                loadedImages++;
+                if (loadedImages === totalImages) {
+                    setTimeout(function() {
+                        preloader.classList.add('hidden');
+                        imageContainer.classList.add('loaded');
+                        
+                        // Скрываем aBar2.png если нужно
+                        if (isBar2Hidden) {
+                            bar2Image.classList.add('hidden-image');
+                        }
+                        
+                        // Показываем подсказку свайпа через 2 секунды
+                        setTimeout(() => {
+                            swipeOverlay.classList.add('active');
+                            setTimeout(() => {
+                                swipeOverlay.classList.remove('active');
+                            }, 2000);
+                        }, 2000);
+                    }, 300);
+                }
+            }
+
+            images.forEach(img => {
+                if (img.complete) {
+                    imageLoaded();
+                } else {
+                    img.addEventListener('load', imageLoaded);
+                    img.addEventListener('error', imageLoaded);
+                }
+            });
+
+            if (loadedImages === totalImages) {
+                setTimeout(function() {
+                    preloader.classList.add('hidden');
+                    imageContainer.classList.add('loaded');
+                }, 300);
+            }
+        });
+
+        // Обработчик для aBar2.png
+        document.getElementById('bar2-image').addEventListener('click', function() {
+            if (!isBar2Hidden) {
+                // Сохраняем в localStorage
+                localStorage.setItem('bar2Hidden', 'true');
+                
+                // Анимация скрытия
+                this.style.transition = 'opacity 0.5s ease, transform 0.5s ease, height 0.5s ease';
+                this.style.opacity = '0';
+                this.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    this.classList.add('hidden-image');
+                }, 500);
+            }
+        });
+
+        // Swipe для aBar3.png
+        const bar3Image = document.getElementById('bar3-image');
+        const swipeIndicator = document.getElementById('swipeIndicator');
+        let startX = 0;
+        let isSwiping = false;
+        const swipeThreshold = 150; // Минимальное расстояние свайпа
+
+        bar3Image.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            isSwiping = true;
+            swipeOverlay.classList.add('active');
+        });
+
+        bar3Image.addEventListener('touchmove', function(e) {
+            if (!isSwiping) return;
+            
+            const currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            
+            if (diffX > 0) { // Только свайп вправо
+                const progress = Math.min(diffX / swipeThreshold, 1);
+                swipeIndicator.style.width = `${progress * 100}%`;
+                
+                // Анимация изображения
+                this.style.transform = `translateX(${diffX * 0.3}px)`;
+            }
+        });
+
+        bar3Image.addEventListener('touchend', function(e) {
+            if (!isSwiping) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = endX - startX;
+            
+            if (diffX >= swipeThreshold) {
+                // Успешный свайп - меняем изображение
+                this.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                this.style.transform = 'translateX(100%)';
+                this.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Загружаем новое изображение
+                    this.src = 'aBar3Hide.png';
+                    this.style.transform = 'translateX(-100%)';
+                    
+                    setTimeout(() => {
+                        this.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                        this.style.transform = 'translateX(0)';
+                        this.style.opacity = '1';
+                        
+                        // Сохраняем состояние в localStorage
+                        localStorage.setItem('bar3Swiped', 'true');
+                    }, 50);
+                }, 500);
+            } else {
+                // Недостаточный свайп - возвращаем
+                this.style.transition = 'transform 0.3s ease';
+                this.style.transform = 'translateX(0)';
+            }
+            
+            // Сбрасываем
+            swipeIndicator.style.width = '0';
+            swipeOverlay.classList.remove('active');
+            isSwiping = false;
+            
+            // Показываем подсказку через 3 секунды если свайп не выполнен
+            if (diffX < swipeThreshold && !localStorage.getItem('bar3Swiped')) {
+                setTimeout(() => {
+                    swipeOverlay.classList.add('active');
+                    setTimeout(() => {
+                        swipeOverlay.classList.remove('active');
+                    }, 2000);
+                }, 3000);
+            }
+        });
+
+        // Тактильная отдача
+        document.getElementById('bar2-image').addEventListener('touchstart', function() {
+            if (!isBar2Hidden) {
+                this.style.transform = 'translateY(4px) scale(0.98)';
+            }
+        });
+        
+        document.getElementById('bar2-image').addEventListener('touchend', function() {
+            if (!isBar2Hidden) {
+                this.style.transform = 'translateY(0) scale(1)';
+            }
+        });
+
+        // Возврат на главную при нажатии на aBar1.png
+        document.getElementById('bar1-image').addEventListener('click', function() {
+            navigateToPage('index.html');
+        });
+        
+        document.getElementById('bar1-image').addEventListener('touchstart', function() {
+            this.style.transform = 'translateY(4px) scale(0.98)';
+        });
+        
+        document.getElementById('bar1-image').addEventListener('touchend', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+
+        function navigateToPage(url) {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(function() {
+                window.location.href = url;
+            }, 500);
+        }
+
+        // Проверяем состояние aBar3 при загрузке
+        if (localStorage.getItem('bar3Swiped') === 'true') {
+            // Если уже свайпнули, показываем скрытую версию
+            window.addEventListener('load', function() {
+                const bar3Image = document.getElementById('bar3-image');
+                bar3Image.src = 'aBar3Hide.png';
+            });
+        }
+    </script>
+</body>
+</html>
