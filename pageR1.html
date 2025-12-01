@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цифровой след</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Ubuntu Mono', monospace;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .trace-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .trace-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .trace-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .trace-item {
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #111;
+        }
+        
+        .trace-item-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ff4444;
+        }
+        
+        .trace-item-data {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .action-button {
+            padding: 15px 30px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 35px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Ubuntu Mono', monospace;
+            transition: transform 0.2s ease, background 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .action-button:active {
+            transform: scale(0.95);
+            background: #ff3333;
+        }
+        
+        .secondary-button {
+            background: #333;
+        }
+        
+        .secondary-button:active {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="trace-container">
+        <div class="trace-title">
+            ЦИФРОВОЙ СЛЕД
+        </div>
+        
+        <div class="trace-list" id="traceList">
+            <!-- Следы будут добавлены через JavaScript -->
+        </div>
+        
+        <div class="buttons-container">
+            <button class="action-button" onclick="clearHistory()">
+                ОЧИСТИТЬ ИСТОРИЮ
+            </button>
+            <button class="action-button secondary-button" onclick="navigateToPage('index.html')">
+                НА ГЛАВНУЮ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Функция форматирования даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Функция для получения данных о пользователе
+        function getUserTraceData() {
+            const traces = [];
+            
+            // Первый вход (из welcome)
+            const firstVisitData = localStorage.getItem('userFirstVisit');
+            if (firstVisitData) {
+                const data = JSON.parse(firstVisitData);
+                traces.push({
+                    title: 'ПЕРВЫЙ ВХОД',
+                    data: formatDate(data.firstVisit)
+                });
+            } else {
+                traces.push({
+                    title: 'ПЕРВЫЙ ВХОД',
+                    data: 'Данные не найдены'
+                });
+            }
+            
+            // Текущая сессия
+            traces.push({
+                title: 'ТЕКУЩАЯ СЕССИЯ',
+                data: formatDate(new Date().toISOString())
+            });
+            
+            // Устройство
+            traces.push({
+                title: 'УСТРОЙСТВО',
+                data: navigator.userAgent.substring(0, 50) + '...'
+            });
+            
+            // Размер экрана
+            traces.push({
+                title: 'ЭКРАН',
+                data: `${screen.width} × ${screen.height}px`
+            });
+            
+            // Язык
+            traces.push({
+                title: 'ЯЗЫК СИСТЕМЫ',
+                data: navigator.language
+            });
+            
+            // Память (приблизительно)
+            traces.push({
+                title: 'ПАМЯТЬ',
+                data: navigator.deviceMemory ? `${navigator.deviceMemory}GB` : 'Недоступно'
+            });
+            
+            // Онлайн статус
+            traces.push({
+                title: 'СТАТУС',
+                data: navigator.onLine ? 'ОНЛАЙН' : 'ОФФЛАЙН'
+            });
+            
+            return traces;
+        }
+
+        // Функция отображения следов
+        function displayTraceData() {
+            const traceList = document.getElementById('traceList');
+            const traces = getUserTraceData();
+            
+            traceList.innerHTML = '';
+            
+            traces.forEach(trace => {
+                const traceItem = document.createElement('div');
+                traceItem.className = 'trace-item';
+                traceItem.innerHTML = `
+                    <div class="trace-item-title">${trace.title}</div>
+                    <div class="trace-item-data">${trace.data}</div>
+                `;
+                traceList.appendChild(traceItem);
+            });
+        }
+
+        // Функция очистки истории
+        function clearHistory() {
+            if (confirm('Очистить всю историю?')) {
+                localStorage.removeItem('userFirstVisit');
+                // Можно добавить удаление других данных
+                displayTraceData(); // Обновляем отображение
+                alert('История очищена');
+            }
+        }
+
+        // Функция перехода на другую страницу
+        function navigateToPage(url) {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(function() {
+                window.location.href = url;
+            }, 500);
+        }
+
+        // Инициализация при загрузке страницы
+        window.addEventListener('load', function() {
+            // Анимация появления
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(20px)';
+            
+            setTimeout(function() {
+                document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                document.body.style.opacity = '1';
+                document.body.style.transform = 'translateY(0)';
+                
+                // Отображаем данные
+                displayTraceData();
+            }, 50);
+        });
+
+        // Тактильная отдача для кнопок
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.style.transform = 'translateY(4px) scale(0.98)';
+            });
+            
+            button.addEventListener('touchend', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
