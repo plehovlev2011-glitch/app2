@@ -256,18 +256,18 @@
             // Определяем направление свайпа
             if (Math.abs(diffX) > swipeThreshold) {
                 if (diffX > 0) {
-                    // СВАЙП СПРАВА НАЛЕВО (палец двигается вправо)
-                    // Если на aBar3Hide.png → переходим к aBar3.png
-                    if (currentImage === 'hide') {
-                        currentImage = 'show';
-                        localStorage.setItem('bar3Swiped', 'false');
-                    }
-                } else {
-                    // СВАЙП СЛЕВА НАПРАВО (палец двигается влево)
+                    // СВАЙП СЛЕВА НАПРАВО (палец двигается вправо)
                     // Если на aBar3.png → переходим к aBar3Hide.png
                     if (currentImage === 'show') {
                         currentImage = 'hide';
                         localStorage.setItem('bar3Swiped', 'true');
+                    }
+                } else {
+                    // СВАЙП СПРАВА НАЛЕВО (палец двигается влево)
+                    // Если на aBar3Hide.png → переходим к aBar3.png
+                    if (currentImage === 'hide') {
+                        currentImage = 'show';
+                        localStorage.setItem('bar3Swiped', 'false');
                     }
                 }
                 
