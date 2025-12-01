@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка устройства</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Ubuntu Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .device-check-container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .device-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #ff4444;
+        }
+        
+        .device-message {
+            font-size: 18px;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+        
+        .qr-code {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 40px;
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        .continue-button {
+            padding: 15px 30px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 35px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Ubuntu Mono', monospace;
+            transition: transform 0.2s ease, background 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .continue-button:active {
+            transform: scale(0.95);
+            background: #ff3333;
+        }
+        
+        /* Защита от скачивания */
+        .protected-area {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #111;
+        }
+        
+        .protected-image {
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            pointer-events: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .protection-text {
+            font-size: 14px;
+            margin-top: 15px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="device-check-container" id="container">
+        <!-- Контент будет меняться в зависимости от устройства -->
+    </div>
+
+    <script>
+        // Определение типа устройства
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Функция для создания контента для мобильных устройств
+        function createMobileContent() {
+            return `
+                <div class="device-title">
+                    ВСЁ В ПОРЯДКЕ
+                </div>
+                <div class="device-message">
+                    Устройство проверено. Можно продолжать использование приложения.
+                </div>
+                <div class="protected-area">
+                    <img src="demo-protected.png" alt="Защищенное изображение" class="protected-image" oncontextmenu="return false;">
+                    <div class="protection-text">
+                        Изображения защищены от скачивания
+                    </div>
+                </div>
+                <button class="continue-button" onclick="continueToApp()">
+                    ПРОДОЛЖИТЬ
+                </button>
+            `;
+        }
+
+        // Функция для создания контента для компьютеров
+        function createDesktopContent() {
+            return `
+                <div class="device-title">
+                    ПРОДОЛЖИТЕ НА УСТРОЙСТВЕ
+                </div>
+                <div class="device-message">
+                    Для использования приложения отсканируйте QR-код на мобильном устройстве
+                </div>
+                <img src="qrAppP.png" alt="QR-код приложения" class="qr-code" oncontextmenu="return false;">
+                <div class="protected-area">
+                    <img src="demo-protected.png" alt="Защищенное изображение" class="protected-image" oncontextmenu="return false;">
+                    <div class="protection-text">
+                        Изображения защищены от скачивания
+                    </div>
+                </div>
+            `;
+        }
+
+        // Инициализация страницы
+        function initPage() {
+            const container = document.getElementById('container');
+            
+            if (isMobileDevice()) {
+                container.innerHTML = createMobileContent();
+            } else {
+                container.innerHTML = createDesktopContent();
+            }
+
+            // Защита от контекстного меню (правый клик)
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Защита от перетаскивания изображений
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Защита от выделения текста
+            document.addEventListener('selectstart', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Добавляем CSS защиту для всех изображений
+            const style = document.createElement('style');
+            style.textContent = `
+                img {
+                    -webkit-user-drag: none;
+                    -khtml-user-drag: none;
+                    -moz-user-drag: none;
+                    -o-user-drag: none;
+                    user-drag: none;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Функция продолжения для мобильных устройств
+        function continueToApp() {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(function() {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+
+        // Анимация появления
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(20px)';
+            
+            setTimeout(function() {
+                document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                document.body.style.opacity = '1';
+                document.body.style.transform = 'translateY(0)';
+                
+                initPage();
+            }, 50);
+        });
+
+        // Тактильная отдача для кнопок
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('continue-button')) {
+                e.target.style.transform = 'translateY(4px) scale(0.98)';
+                setTimeout(() => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                }, 200);
+            }
+        });
+    </script>
+</body>
+</html>
