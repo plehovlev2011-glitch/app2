@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Специальная страница</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            min-height: 100vh;
+            position: relative;
+            background: #000;
+        }
+        
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        
+        .top-image {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 100vw;
+            height: auto;
+            z-index: 2;
+        }
+        
+        .center-image {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            max-width: 80vw;
+            max-height: 80vh;
+            z-index: 3;
+        }
+        
+        /* Адаптивность для разных экранов */
+        @media (max-width: 768px) {
+            .center-image {
+                max-width: 90vw;
+                max-height: 90vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .center-image {
+                max-width: 95vw;
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Фон на весь экран -->
+    <img src="backgroundF.png" alt="Фон" class="background-image">
+    
+    <!-- Изображение прикрепленное к верху -->
+    <img src="se1.png" alt="Верхнее изображение" class="top-image">
+    
+    <!-- Изображение посередине -->
+    <img src="se2.png" alt="Центральное изображение" class="center-image">
+
+    <script>
+        // Адаптивная настройка высоты верхнего изображения
+        function adjustTopImage() {
+            const topImage = document.querySelector('.top-image');
+            const centerImage = document.querySelector('.center-image');
+            
+            // Для очень высоких экранов ограничиваем высоту верхнего изображения
+            if (window.innerHeight > window.innerWidth * 2) {
+                topImage.style.maxHeight = '40vh';
+            } else {
+                topImage.style.maxHeight = 'none';
+            }
+            
+            // Центрируем центральное изображение с учетом верхнего
+            const topImageHeight = topImage.naturalHeight * (topImage.offsetWidth / topImage.naturalWidth);
+            const availableHeight = window.innerHeight - topImageHeight;
+            
+            if (availableHeight < window.innerHeight * 0.3) {
+                centerImage.style.maxHeight = `${availableHeight * 0.8}px`;
+            }
+        }
+        
+        // Вызываем при загрузке и изменении размера окна
+        window.addEventListener('load', adjustTopImage);
+        window.addEventListener('resize', adjustTopImage);
+        
+        // Ждем загрузки изображений для точных расчетов
+        window.addEventListener('load', function() {
+            const images = document.querySelectorAll('img');
+            let loadedCount = 0;
+            
+            images.forEach(img => {
+                if (img.complete) {
+                    loadedCount++;
+                } else {
+                    img.addEventListener('load', function() {
+                        loadedCount++;
+                        if (loadedCount === images.length) {
+                            adjustTopImage();
+                        }
+                    });
+                }
+            });
+            
+            if (loadedCount === images.length) {
+                adjustTopImage();
+            }
+        });
+    </script>
+</body>
+</html>
