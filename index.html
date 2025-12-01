@@ -69,6 +69,10 @@
         #first-image:active {
             transform: translateY(4px) scale(0.98);
         }
+        
+        #second-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -80,7 +84,7 @@
     <!-- Основной контент -->
     <div class="image-container" id="imageContainer">
         <img id="first-image" src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
-        <img src="2.png" alt="Изображение 2">
+        <img id="second-image" src="2.png" alt="Изображение 2" onclick="navigateToPage('new1.html')">
         <img src="3.png" alt="Изображение 3">
         <img src="4.png" alt="Изображение 4">
         <img src="5.png" alt="Изображение 5">
@@ -95,11 +99,9 @@
             const preloader = document.getElementById('preloader');
             const imageContainer = document.getElementById('imageContainer');
 
-            // Функция проверки загрузки всех изображений
             function imageLoaded() {
                 loadedImages++;
                 if (loadedImages === totalImages) {
-                    // Все изображения загружены - показываем контент
                     setTimeout(function() {
                         preloader.classList.add('hidden');
                         imageContainer.classList.add('loaded');
@@ -107,17 +109,15 @@
                 }
             }
 
-            // Проверяем каждое изображение
             images.forEach(img => {
                 if (img.complete) {
                     imageLoaded();
                 } else {
                     img.addEventListener('load', imageLoaded);
-                    img.addEventListener('error', imageLoaded); // На случай ошибки загрузки
+                    img.addEventListener('error', imageLoaded);
                 }
             });
 
-            // На случай если некоторые изображения уже загружены
             if (loadedImages === totalImages) {
                 setTimeout(function() {
                     preloader.classList.add('hidden');
@@ -136,12 +136,22 @@
             }, 500);
         }
 
+        // Тактильная отдача для картинок
         const firstImage = document.getElementById('first-image');
         firstImage.addEventListener('touchstart', function() {
             this.style.transform = 'translateY(4px) scale(0.98)';
         });
         
         firstImage.addEventListener('touchend', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+
+        const secondImage = document.getElementById('second-image');
+        secondImage.addEventListener('touchstart', function() {
+            this.style.transform = 'translateY(4px) scale(0.98)';
+        });
+        
+        secondImage.addEventListener('touchend', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
     </script>
