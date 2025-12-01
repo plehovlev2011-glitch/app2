@@ -64,6 +64,10 @@
         #first-image:active {
             transform: translateY(4px) scale(0.98);
         }
+        
+        #third-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -76,7 +80,7 @@
     <div class="image-container" id="imageContainer">
         <img id="first-image" src="Untitled (64).png" alt="Untitled 64" onclick="navigateToPage('page2.html')">
         <img src="Untitled (65).png" alt="Untitled 65">
-        <img src="Untitled (66).png" alt="Untitled 66">
+        <img id="third-image" src="Untitled (66).png" alt="Untitled 66" onclick="navigateToPage('pageR1.html')">
         <img src="Untitled (67).png" alt="Untitled 67">
         <img src="Untitled (68).png" alt="Untitled 68">
     </div>
@@ -133,6 +137,15 @@
         });
         
         firstImage.addEventListener('touchend', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+
+        const thirdImage = document.getElementById('third-image');
+        thirdImage.addEventListener('touchstart', function() {
+            this.style.transform = 'translateY(4px) scale(0.98)';
+        });
+        
+        thirdImage.addEventListener('touchend', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
     </script>
