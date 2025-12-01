@@ -68,6 +68,10 @@
         #first-image:active {
             transform: translateY(4px) scale(0.98);
         }
+        
+        #third-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -79,10 +83,9 @@
     <!-- Основной контент -->
     <div class="image-container" id="imageContainer">
         <img id="zero-image" src="zero.png" alt="Zero">
-        <img id="first-image" src="1a.png" alt="Изображение 1a" onclick="navigateToPage('page3.html')">
+        <img id="first-image" src="1a.png" alt="Изображение 1a" onclick="navigateToPage('index.html')">
         <img src="2a.png" alt="Изображение 2a">
-        <img src="promo20.png" alt="Promo 20">
-        <img src="3a.png" alt="Изображение 3a">
+        <img id="third-image" src="3a.png" alt="Изображение 3a" onclick="navigateToPage('special-page.html')">
         <img src="4a.png" alt="Изображение 4a">
         <img src="5a.png" alt="Изображение 5a">
     </div>
@@ -150,6 +153,16 @@
         });
         
         firstImage.addEventListener('touchend', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+
+        // Тактильная отдача для 3a.png
+        const thirdImage = document.getElementById('third-image');
+        thirdImage.addEventListener('touchstart', function() {
+            this.style.transform = 'translateY(4px) scale(0.98)';
+        });
+        
+        thirdImage.addEventListener('touchend', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
     </script>
