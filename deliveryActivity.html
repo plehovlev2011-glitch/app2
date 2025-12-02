@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доставка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow-x: hidden;
+            background: #000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        body.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .content {
+            width: 100vw;
+            min-height: 100vh;
+            background: #000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        Страница доставки (в разработке)
+    </div>
+
+    <script>
+        // Анимация появления
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.body.classList.add('loaded');
+            }, 50);
+        });
+
+        // Возврат на главную при нажатии
+        document.addEventListener('click', function() {
+            document.body.classList.remove('loaded');
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            
+            setTimeout(function() {
+                window.location.href = 'index.html';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
