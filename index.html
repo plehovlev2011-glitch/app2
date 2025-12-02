@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Доставка</title>
+    <title>5 изображений</title>
+    <script>
+        if (!localStorage.getItem('hasSeenWelcome')) {
+            window.location.href = 'welcome.html';
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -14,51 +19,144 @@
         body {
             overflow-x: hidden;
             background: #000;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
         
-        body.loaded {
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader-gif {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .image-container {
+            width: 100vw;
+            background: #000;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .image-container.loaded {
             opacity: 1;
             transform: translateY(0);
         }
         
-        .content {
-            width: 100vw;
-            min-height: 100vh;
-            background: #000;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: monospace;
-            font-size: 24px;
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        #wy-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
+        
+        #first-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
+        
+        #second-image:active {
+            transform: translateY(4px) scale(0.98);
+        }
+        
+        #third-image:active {
+            transform: translateY(4px) scale(0.98);
         }
     </style>
 </head>
 <body>
-    <div class="content">
-        Страница доставки (в разработке)
+    <!-- Прелоадер -->
+    <div class="preloader" id="preloader">
+        <img src="loadgif.gif" alt="Загрузка" class="loader-gif">
+    </div>
+
+    <!-- Основной контент -->
+    <div class="image-container" id="imageContainer">
+        <img id="wy-image" src="wY.png" alt="Доставка" onclick="navigateToPage('deliveryActivity.html')">
+        <img id="first-image" src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
+        <img id="second-image" src="2.png" alt="Изображение 2" onclick="navigateToPage('new1.html')">
+        <img id="third-image" src="3.png" alt="Изображение 3" onclick="navigateToPage('bpage.html')">
+        <img src="4.png" alt="Изображение 4">
+        <img src="5.png" alt="Изображение 5">
     </div>
 
     <script>
-        // Анимация появления
+        // Ждем загрузки всех изображений
         window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.body.classList.add('loaded');
-            }, 50);
+            const images = document.querySelectorAll('.image-container img');
+            const totalImages = images.length;
+            let loadedImages = 0;
+            const preloader = document.getElementById('preloader');
+            const imageContainer = document.getElementById('imageContainer');
+
+            function imageLoaded() {
+                loadedImages++;
+                if (loadedImages === totalImages) {
+                    setTimeout(function() {
+                        preloader.classList.add('hidden');
+                        imageContainer.classList.add('loaded');
+                    }, 300);
+                }
+            }
+
+            images.forEach(img => {
+                if (img.complete) {
+                    imageLoaded();
+                } else {
+                    img.addEventListener('load', imageLoaded);
+                    img.addEventListener('error', imageLoaded);
+                }
+            });
+
+            if (loadedImages === totalImages) {
+                setTimeout(function() {
+                    preloader.classList.add('hidden');
+                    imageContainer.classList.add('loaded');
+                }, 300);
+            }
         });
 
-        // Возврат на главную при нажатии
-        document.addEventListener('click', function() {
-            document.body.classList.remove('loaded');
+        function navigateToPage(url) {
             document.body.style.opacity = '0';
             document.body.style.transform = 'translateY(-20px)';
+            document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             
             setTimeout(function() {
-                window.location.href = 'index.html';
+                window.location.href = url;
             }, 500);
+        }
+
+        // Тактильная отдача для всех кликабельных картинок
+        ['wy-image', 'first-image', 'second-image', 'third-image'].forEach(id => {
+            const image = document.getElementById(id);
+            if (image) {
+                image.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(4px) scale(0.98)';
+                });
+                
+                image.addEventListener('touchend', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
         });
     </script>
 </body>
