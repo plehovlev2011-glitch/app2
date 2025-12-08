@@ -79,7 +79,7 @@
             user-select: none;
         }
         
-        .slider-text {
+        .slider-hint {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -88,6 +88,7 @@
             color: #666;
             pointer-events: none;
             white-space: nowrap;
+            transition: opacity 0.3s ease;
         }
         
         .slider-success {
@@ -166,7 +167,7 @@
         <div class="slider-area" id="sliderArea">
             <div class="slider-track"></div>
             <div class="slider-thumb" id="sliderThumb">→</div>
-            <div class="slider-text" id="sliderHint">Проведите →</div>
+            <div class="slider-hint" id="sliderHint">Проведите →</div>
             <div class="slider-success" id="sliderSuccess">ДОСТУП ОТКРЫТ!</div>
         </div>
     </div>
@@ -269,8 +270,10 @@
                 setTimeout(function() {
                     successOverlay.classList.add('active');
                     
-                    // Сохраняем в localStorage
+                    // СОХРАНЯЕМ, ЧТО ПОЛЬЗОВАТЕЛЬ ПРОШЕЛ СЛАЙДЕР
                     localStorage.setItem('hasPassedSlider', 'true');
+                    // УДАЛЯЕМ ФЛАГ ПОПЫТКИ ВХОДА
+                    localStorage.removeItem('hasTriedBpage');
                 }, 500);
             } else {
                 // Неудача - возвращаем в начало
