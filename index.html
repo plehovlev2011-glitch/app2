@@ -94,7 +94,7 @@
         <img id="wy-image" src="wY.png" alt="Доставка" onclick="navigateToPage('deliveryActivity.html')">
         <img id="first-image" src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
         <img id="second-image" src="2.png" alt="Изображение 2" onclick="navigateToPage('new1.html')">
-        <img id="third-image" src="3.png" alt="Изображение 3" onclick="navigateToPage('bpage.html')">
+        <img id="third-image" src="3.png" alt="Изображение 3" onclick="checkBpageAccess()">
         <img src="4.png" alt="Изображение 4">
         <img src="5.png" alt="Изображение 5">
     </div>
@@ -134,6 +134,33 @@
                 }, 300);
             }
         });
+
+        // Функция проверки доступа к bpage.html
+        function checkBpageAccess() {
+            // Проверяем, прошел ли пользователь слайдер
+            const hasPassedSlider = localStorage.getItem('hasPassedSlider') === 'true';
+            
+            // Проверяем, пытался ли пользователь уже зайти на bpage
+            const hasTriedBpage = localStorage.getItem('hasTriedBpage') === 'true';
+            
+            // Если НЕ прошел слайдер ИЛИ НЕ пытался еще зайти
+            if (!hasPassedSlider && !hasTriedBpage) {
+                // Сохраняем, что пользователь пытался зайти
+                localStorage.setItem('hasTriedBpage', 'true');
+                // Отправляем на prebpage.html
+                navigateToPage('prebpage.html');
+            } 
+            // Если прошел слайдер
+            else if (hasPassedSlider) {
+                // Прямой доступ к bpage.html
+                navigateToPage('bpage.html');
+            }
+            // Если пытался зайти, но не прошел слайдер
+            else if (hasTriedBpage && !hasPassedSlider) {
+                // Снова отправляем на prebpage.html
+                navigateToPage('prebpage.html');
+            }
+        }
 
         function navigateToPage(url) {
             document.body.style.opacity = '0';
