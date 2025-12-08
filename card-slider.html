@@ -20,14 +20,75 @@
             color: #fff;
             font-family: 'Ubuntu Mono', monospace;
             min-height: 100vh;
-            padding: 40px 20px;
             touch-action: pan-y;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #333;
+            border-top: 4px solid #ff4444;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 16px;
+            text-align: center;
+            height: 40px;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .loading-text.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .slider-container {
             max-width: 600px;
-            margin: 0 auto;
+            width: 100%;
             text-align: center;
+            padding: 40px 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .slider-container.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .slider-title {
@@ -109,21 +170,7 @@
             z-index: 1;
         }
         
-        .slider-success {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 18px;
-            color: #ff4444;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .success-overlay {
+        .success-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -141,17 +188,34 @@
             padding: 20px;
         }
         
-        .success-overlay.active {
+        .success-screen.active {
             opacity: 1;
             pointer-events: all;
         }
         
         .success-text {
-            font-size: 24px;
+            font-size: 36px;
             font-weight: bold;
             color: #ff4444;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards 0.5s;
+        }
+        
+        .success-subtext {
+            font-size: 18px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards 1s;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .continue-button {
@@ -166,7 +230,10 @@
             font-family: 'Ubuntu Mono', monospace;
             transition: transform 0.2s ease, background 0.3s ease;
             letter-spacing: 0.5px;
-            margin-top: 20px;
+            margin-top: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards 1.5s;
             -webkit-tap-highlight-color: transparent;
         }
         
@@ -190,7 +257,14 @@
     </style>
 </head>
 <body>
-    <div class="slider-container">
+    <!-- Экран загрузки -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText"></div>
+    </div>
+
+    <!-- Основной контент (появится через 10 секунд) -->
+    <div class="slider-container" id="sliderContainer">
         <div class="slider-title">
             Я НАЧИНАЮ ПОЛЬЗОВАТЬСЯ ПЕРЕЦ.КАРТОЙ
         </div>
@@ -203,14 +277,16 @@
             <div class="slider-progress" id="sliderProgress"></div>
             <div class="slider-thumb" id="sliderThumb">→</div>
             <div class="slider-hint" id="sliderHint">Проведите →</div>
-            <div class="slider-success" id="sliderSuccess">ДОСТУП ОТКРЫТ!</div>
         </div>
     </div>
 
-    <div class="success-overlay" id="successOverlay">
+    <!-- Экран успеха -->
+    <div class="success-screen" id="successScreen">
         <div class="success-text">
-            ДОСТУП ОТКРЫТ!<br>
-            Теперь вы можете использовать все функции
+            Супер!
+        </div>
+        <div class="success-subtext">
+            Доступ к странице получен
         </div>
         <button class="continue-button" onclick="continueToBpage()">
             ПРОДОЛЖИТЬ НА СТРАНИЦУ
@@ -218,20 +294,34 @@
     </div>
 
     <script>
+        const loadingScreen = document.getElementById('loadingScreen');
+        const loadingText = document.getElementById('loadingText');
+        const sliderContainer = document.getElementById('sliderContainer');
         const sliderArea = document.getElementById('sliderArea');
         const sliderThumb = document.getElementById('sliderThumb');
         const sliderProgress = document.getElementById('sliderProgress');
-        const sliderSuccess = document.getElementById('sliderSuccess');
-        const successOverlay = document.getElementById('successOverlay');
         const sliderHint = document.getElementById('sliderHint');
+        const successScreen = document.getElementById('successScreen');
         
         let isDragging = false;
         let startX = 0;
         let currentX = 0;
-        const sliderWidth = sliderArea.offsetWidth;
-        const thumbWidth = sliderThumb.offsetWidth;
-        const maxDrag = sliderWidth - thumbWidth - 20;
-        const successThreshold = maxDrag * 0.9;
+        let sliderWidth, thumbWidth, maxDrag, successThreshold;
+        
+        // Список текстов для загрузки
+        const loadingMessages = [
+            "Подгружаем документы",
+            "Загружаем соглашения", 
+            "Проверка возможности выпуска",
+            "Обращение к серверу",
+            "Регистрация нового штрих-кода",
+            "Генерация ключей",
+            "Готово"
+        ];
+        
+        let currentMessageIndex = 0;
+        const totalLoadingTime = 10000; // 10 секунд
+        const messageInterval = totalLoadingTime / loadingMessages.length;
         
         // Предотвращаем стандартное поведение для тач-устройств
         document.addEventListener('touchmove', function(e) {
@@ -242,55 +332,97 @@
         
         // Анимация появления
         window.addEventListener('load', function() {
-            document.body.style.opacity = '0';
-            document.body.style.transform = 'translateY(20px)';
+            startLoadingAnimation();
+        });
+        
+        function startLoadingAnimation() {
+            // Показываем первый текст
+            showNextLoadingMessage();
             
+            // Меняем текст каждые интервал
+            const messageTimer = setInterval(showNextLoadingMessage, messageInterval);
+            
+            // Через 10 секунд показываем слайдер
             setTimeout(function() {
-                document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                document.body.style.opacity = '1';
-                document.body.style.transform = 'translateY(0)';
-            }, 50);
-        });
+                clearInterval(messageTimer);
+                
+                // Скрываем экран загрузки
+                loadingScreen.classList.add('hidden');
+                
+                // Показываем слайдер
+                setTimeout(function() {
+                    sliderContainer.classList.add('visible');
+                    initSlider();
+                }, 500);
+                
+            }, totalLoadingTime);
+        }
         
-        // Начало перетаскивания (для тач-устройств)
-        sliderThumb.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            startDrag(e.touches[0]);
-        }, { passive: false });
-        
-        // Для десктопов
-        sliderThumb.addEventListener('mousedown', function(e) {
-            e.preventDefault();
-            startDrag(e);
-        });
-        
-        // Перетаскивание (для тач-устройств)
-        document.addEventListener('touchmove', function(e) {
-            if (isDragging) {
-                e.preventDefault();
-                drag(e.touches[0]);
+        function showNextLoadingMessage() {
+            if (currentMessageIndex < loadingMessages.length) {
+                // Убираем текущий текст
+                loadingText.classList.remove('visible');
+                
+                setTimeout(() => {
+                    // Меняем текст
+                    loadingText.textContent = loadingMessages[currentMessageIndex];
+                    currentMessageIndex++;
+                    
+                    // Показываем с анимацией
+                    setTimeout(() => {
+                        loadingText.classList.add('visible');
+                    }, 50);
+                }, 300);
             }
-        }, { passive: false });
+        }
         
-        // Для десктопов
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
+        function initSlider() {
+            // Инициализируем размеры слайдера
+            sliderWidth = sliderArea.offsetWidth;
+            thumbWidth = sliderThumb.offsetWidth;
+            maxDrag = sliderWidth - thumbWidth - 20;
+            successThreshold = maxDrag * 0.9;
+            
+            // Начало перетаскивания (для тач-устройств)
+            sliderThumb.addEventListener('touchstart', function(e) {
                 e.preventDefault();
-                drag(e);
-            }
-        });
-        
-        // Окончание перетаскивания
-        document.addEventListener('touchend', endDrag);
-        document.addEventListener('mouseup', endDrag);
-        
-        // Предотвращаем выделение текста при перетаскивании
-        document.addEventListener('selectstart', function(e) {
-            if (isDragging) {
+                startDrag(e.touches[0]);
+            }, { passive: false });
+            
+            // Для десктопов
+            sliderThumb.addEventListener('mousedown', function(e) {
                 e.preventDefault();
-            }
-        });
-
+                startDrag(e);
+            });
+            
+            // Перетаскивание (для тач-устройств)
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    drag(e.touches[0]);
+                }
+            }, { passive: false });
+            
+            // Для десктопов
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    drag(e);
+                }
+            });
+            
+            // Окончание перетаскивания
+            document.addEventListener('touchend', endDrag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Предотвращаем выделение текста при перетаскивании
+            document.addEventListener('selectstart', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                }
+            });
+        }
+        
         function startDrag(e) {
             isDragging = true;
             startX = e.clientX || e.pageX;
@@ -310,17 +442,15 @@
             const diffX = clientX - startX;
             currentX = Math.max(10, Math.min(maxDrag, 10 + diffX));
             
-            // Плавное обновление позиции без requestAnimationFrame
+            // Плавное обновление позиции
             sliderThumb.style.left = currentX + 'px';
             sliderProgress.style.width = ((currentX - 10) / (maxDrag - 10) * 100) + '%';
             
             // Проверяем достижение порога
             if (currentX >= successThreshold) {
-                sliderSuccess.style.opacity = '1';
                 sliderThumb.style.background = '#4CAF50';
                 sliderThumb.textContent = '✓';
             } else {
-                sliderSuccess.style.opacity = '0';
                 sliderThumb.style.background = '#ff4444';
                 sliderThumb.textContent = '→';
             }
@@ -339,7 +469,8 @@
                 sliderProgress.style.width = '100%';
                 
                 setTimeout(function() {
-                    successOverlay.classList.add('active');
+                    // Показываем экран "Супер!"
+                    successScreen.classList.add('active');
                     
                     // Сохраняем в localStorage
                     localStorage.setItem('hasPassedSlider', 'true');
@@ -351,7 +482,6 @@
                 sliderThumb.style.background = '#ff4444';
                 sliderThumb.textContent = '→';
                 sliderProgress.style.width = '0%';
-                sliderSuccess.style.opacity = '0';
                 
                 setTimeout(function() {
                     sliderHint.style.opacity = '1';
@@ -385,10 +515,11 @@
         
         // Инициализация размера при загрузке
         window.addEventListener('resize', function() {
-            // Пересчитываем размеры при изменении окна
-            const sliderWidth = sliderArea.offsetWidth;
-            maxDrag = sliderWidth - thumbWidth - 20;
-            successThreshold = maxDrag * 0.9;
+            if (sliderArea) {
+                sliderWidth = sliderArea.offsetWidth;
+                maxDrag = sliderWidth - thumbWidth - 20;
+                successThreshold = maxDrag * 0.9;
+            }
         });
     </script>
 </body>
