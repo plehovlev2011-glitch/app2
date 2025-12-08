@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Перец.Карта</title>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
@@ -10,6 +10,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
         
         body {
@@ -19,6 +21,7 @@
             font-family: 'Ubuntu Mono', monospace;
             min-height: 100vh;
             padding: 40px 20px;
+            touch-action: pan-y;
         }
         
         .slider-container {
@@ -50,6 +53,8 @@
             margin: 40px auto;
             overflow: hidden;
             border: 2px solid #333;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .slider-track {
@@ -59,6 +64,16 @@
             width: 100%;
             height: 100%;
             background: #222;
+        }
+        
+        .slider-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444 0%, #ff6666 100%);
+            transition: width 0.1s ease;
         }
         
         .slider-thumb {
@@ -71,11 +86,13 @@
             background: #ff4444;
             border-radius: 50%;
             cursor: pointer;
-            transition: left 0.1s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            -webkit-user-select: none;
             user-select: none;
         }
         
@@ -89,6 +106,7 @@
             pointer-events: none;
             white-space: nowrap;
             transition: opacity 0.3s ease;
+            z-index: 1;
         }
         
         .slider-success {
@@ -102,6 +120,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
+            z-index: 1;
         }
         
         .success-overlay {
@@ -110,7 +129,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -119,6 +138,7 @@
             pointer-events: none;
             transition: opacity 0.5s ease;
             z-index: 1000;
+            padding: 20px;
         }
         
         .success-overlay.active {
@@ -147,11 +167,25 @@
             transition: transform 0.2s ease, background 0.3s ease;
             letter-spacing: 0.5px;
             margin-top: 20px;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .continue-button:active {
             transform: scale(0.95);
             background: #ff3333;
+        }
+        
+        /* Для iOS Safari */
+        @supports (-webkit-touch-callout: none) {
+            .slider-thumb {
+                cursor: -webkit-grab;
+                cursor: grab;
+            }
+            
+            .slider-thumb:active {
+                cursor: -webkit-grabbing;
+                cursor: grabbing;
+            }
         }
     </style>
 </head>
@@ -166,6 +200,7 @@
         
         <div class="slider-area" id="sliderArea">
             <div class="slider-track"></div>
+            <div class="slider-progress" id="sliderProgress"></div>
             <div class="slider-thumb" id="sliderThumb">→</div>
             <div class="slider-hint" id="sliderHint">Проведите →</div>
             <div class="slider-success" id="sliderSuccess">ДОСТУП ОТКРЫТ!</div>
@@ -185,6 +220,7 @@
     <script>
         const sliderArea = document.getElementById('sliderArea');
         const sliderThumb = document.getElementById('sliderThumb');
+        const sliderProgress = document.getElementById('sliderProgress');
         const sliderSuccess = document.getElementById('sliderSuccess');
         const successOverlay = document.getElementById('successOverlay');
         const sliderHint = document.getElementById('sliderHint');
@@ -194,8 +230,15 @@
         let currentX = 0;
         const sliderWidth = sliderArea.offsetWidth;
         const thumbWidth = sliderThumb.offsetWidth;
-        const maxDrag = sliderWidth - thumbWidth - 20; // 10px отступы с каждой стороны
-        const successThreshold = maxDrag * 0.9; // 90% для успеха
+        const maxDrag = sliderWidth - thumbWidth - 20;
+        const successThreshold = maxDrag * 0.9;
+        
+        // Предотвращаем стандартное поведение для тач-устройств
+        document.addEventListener('touchmove', function(e) {
+            if (isDragging) {
+                e.preventDefault();
+            }
+        }, { passive: false });
         
         // Анимация появления
         window.addEventListener('load', function() {
@@ -208,41 +251,68 @@
                 document.body.style.transform = 'translateY(0)';
             }, 50);
         });
-
-        // Начало перетаскивания
-        sliderThumb.addEventListener('mousedown', startDrag);
+        
+        // Начало перетаскивания (для тач-устройств)
         sliderThumb.addEventListener('touchstart', function(e) {
+            e.preventDefault();
             startDrag(e.touches[0]);
+        }, { passive: false });
+        
+        // Для десктопов
+        sliderThumb.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            startDrag(e);
         });
-
-        // Перетаскивание
-        document.addEventListener('mousemove', drag);
+        
+        // Перетаскивание (для тач-устройств)
         document.addEventListener('touchmove', function(e) {
-            drag(e.touches[0]);
+            if (isDragging) {
+                e.preventDefault();
+                drag(e.touches[0]);
+            }
+        }, { passive: false });
+        
+        // Для десктопов
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging) {
+                e.preventDefault();
+                drag(e);
+            }
         });
-
+        
         // Окончание перетаскивания
-        document.addEventListener('mouseup', endDrag);
         document.addEventListener('touchend', endDrag);
+        document.addEventListener('mouseup', endDrag);
+        
+        // Предотвращаем выделение текста при перетаскивании
+        document.addEventListener('selectstart', function(e) {
+            if (isDragging) {
+                e.preventDefault();
+            }
+        });
 
         function startDrag(e) {
             isDragging = true;
-            startX = e.clientX - sliderThumb.offsetLeft;
+            startX = e.clientX || e.pageX;
+            currentX = parseInt(sliderThumb.style.left) || 10;
             sliderThumb.style.transition = 'none';
+            sliderProgress.style.transition = 'none';
             sliderHint.style.opacity = '0';
+            
+            // Для iOS Safari
+            sliderThumb.style.cursor = 'grabbing';
         }
 
         function drag(e) {
             if (!isDragging) return;
             
-            e.preventDefault();
-            currentX = e.clientX - startX;
+            const clientX = e.clientX || e.pageX;
+            const diffX = clientX - startX;
+            currentX = Math.max(10, Math.min(maxDrag, 10 + diffX));
             
-            // Ограничиваем движение в пределах слайдера
-            if (currentX < 10) currentX = 10;
-            if (currentX > maxDrag) currentX = maxDrag;
-            
+            // Плавное обновление позиции без requestAnimationFrame
             sliderThumb.style.left = currentX + 'px';
+            sliderProgress.style.width = ((currentX - 10) / (maxDrag - 10) * 100) + '%';
             
             // Проверяем достижение порога
             if (currentX >= successThreshold) {
@@ -260,33 +330,36 @@
             if (!isDragging) return;
             
             isDragging = false;
-            sliderThumb.style.transition = 'left 0.3s ease, background 0.3s ease';
+            sliderThumb.style.transition = 'left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.3s ease';
+            sliderProgress.style.transition = 'width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             
             if (currentX >= successThreshold) {
-                // Успех - слайдер дошел до конца
+                // Успех
                 sliderThumb.style.left = maxDrag + 'px';
+                sliderProgress.style.width = '100%';
                 
-                // Показываем успешное сообщение
                 setTimeout(function() {
                     successOverlay.classList.add('active');
                     
-                    // СОХРАНЯЕМ, ЧТО ПОЛЬЗОВАТЕЛЬ ПРОШЕЛ СЛАЙДЕР
+                    // Сохраняем в localStorage
                     localStorage.setItem('hasPassedSlider', 'true');
-                    // УДАЛЯЕМ ФЛАГ ПОПЫТКИ ВХОДА
                     localStorage.removeItem('hasTriedBpage');
-                }, 500);
+                }, 300);
             } else {
-                // Неудача - возвращаем в начало
+                // Возвращаем в начало
                 sliderThumb.style.left = '10px';
                 sliderThumb.style.background = '#ff4444';
                 sliderThumb.textContent = '→';
+                sliderProgress.style.width = '0%';
                 sliderSuccess.style.opacity = '0';
                 
-                // Показываем подсказку через секунду
                 setTimeout(function() {
                     sliderHint.style.opacity = '1';
                 }, 1000);
             }
+            
+            // Для iOS Safari
+            sliderThumb.style.cursor = 'grab';
         }
 
         // Продолжение на bpage.html
@@ -301,12 +374,21 @@
         }
 
         // Тактильная отдача для кнопки
-        document.querySelector('.continue-button').addEventListener('touchstart', function() {
+        const continueButton = document.querySelector('.continue-button');
+        continueButton.addEventListener('touchstart', function() {
             this.style.transform = 'translateY(4px) scale(0.98)';
         });
         
-        document.querySelector('.continue-button').addEventListener('touchend', function() {
+        continueButton.addEventListener('touchend', function() {
             this.style.transform = 'translateY(0) scale(1)';
+        });
+        
+        // Инициализация размера при загрузке
+        window.addEventListener('resize', function() {
+            // Пересчитываем размеры при изменении окна
+            const sliderWidth = sliderArea.offsetWidth;
+            maxDrag = sliderWidth - thumbWidth - 20;
+            successThreshold = maxDrag * 0.9;
         });
     </script>
 </body>
