@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5 изображений</title>
     <script>
         if (!localStorage.getItem('hasSeenWelcome')) {
@@ -15,45 +15,30 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-        
-        html, body {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
         }
         
         body {
-            overflow-x: hidden;
             background: #000;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
         
         .preloader {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            transition: opacity 0.5s ease;
             opacity: 0;
+            transition: opacity 0.5s ease;
         }
         
-        .preloader.visible {
+        .preloader.active {
             opacity: 1;
         }
         
@@ -68,8 +53,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            z-index: 1;
+            overflow: hidden;
         }
         
         .video-loader video {
@@ -77,61 +61,10 @@
             height: 100%;
             object-fit: cover;
             pointer-events: none;
-            -webkit-user-select: none;
-            user-select: none;
         }
         
-        /* Скрываем все элементы управления видео */
+        /* Скрываем элементы управления видео */
         .video-loader video::-webkit-media-controls {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-enclosure {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-panel {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-play-button {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-timeline {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-current-time-display {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-time-remaining-display {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-timeline-container {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-volume-slider {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-mute-button {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-toggle-closed-captions-button {
-            display: none !important;
-        }
-        
-        .video-loader video::-webkit-media-controls-fullscreen-button {
-            display: none !important;
-        }
-        
-        /* Для Firefox */
-        .video-loader video::-moz-media-controls {
             display: none !important;
         }
         
@@ -143,35 +76,27 @@
         }
         
         .image-container {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
             background: #000;
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            transition: opacity 0.8s ease;
         }
         
         .image-container.loaded {
             opacity: 1;
-            transform: translateY(0);
         }
         
         .image-container img,
         .image-container .video-wrapper {
             width: 100%;
-            height: auto;
             display: block;
             cursor: pointer;
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            object-fit: cover;
         }
         
         .video-wrapper {
             position: relative;
             width: 100%;
-            height: auto;
         }
         
         .video-wrapper:active .video-container {
@@ -190,12 +115,11 @@
             transform: translateY(4px) scale(0.98);
         }
         
-        /* Плавный переход между лупами */
+        /* Видео с переходами */
         .video-container {
             position: relative;
             width: 100%;
-            height: 0;
-            padding-bottom: 56.25%; /* 16:9 соотношение */
+            padding-bottom: 56.25%;
             overflow: hidden;
         }
         
@@ -248,21 +172,13 @@
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        
-        /* Запрет прокрутки на всем кроме контейнера */
-        .no-scroll {
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-        }
     </style>
 </head>
-<body class="no-scroll">
+<body>
     <!-- Видео-прелоадер -->
     <div class="preloader" id="preloader">
         <div class="video-loader">
-            <video id="gradientVideo" muted loop playsinline preload="auto" autoplay>
+            <video id="gradientVideo" muted loop playsinline preload="auto">
                 <source src="gradient-loop.mp4" type="video/mp4">
                 Ваш браузер не поддерживает видео.
             </video>
@@ -275,20 +191,17 @@
         <img id="first-image" src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
         <img id="second-image" src="2.png" alt="Изображение 2" onclick="navigateToPage('new1.html')">
         
-        <!-- Видео с плавными переходами между лупами -->
+        <!-- Видео с плавными переходами -->
         <div class="video-wrapper" onclick="checkBpageAccess()">
             <div class="video-container" id="videoContainer">
-                <!-- Первое видео -->
                 <video id="video1" class="video-fade active" muted playsinline preload="auto">
                     <source src="fo.mp4" type="video/mp4">
                     Ваш браузер не поддерживает видео.
                 </video>
-                <!-- Второе видео (для перехода) -->
                 <video id="video2" class="video-fade" muted playsinline preload="auto">
                     <source src="fo.mp4" type="video/mp4">
                     Ваш браузер не поддерживает видео.
                 </video>
-                <!-- Лоадер для перехода -->
                 <div class="video-transition-loader" id="videoTransitionLoader"></div>
             </div>
             <div class="video-overlay"></div>
@@ -299,52 +212,43 @@
     </div>
 
     <script>
-        // Блокируем прокрутку на время загрузки
-        document.addEventListener('touchmove', function(e) {
-            if (!document.getElementById('imageContainer').classList.contains('loaded')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
-        // Блокируем масштабирование
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
-        
-        // Блокируем двойной тап для масштабирования
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(e) {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-
-        // Запускаем видео-прелоадер
+        // Упрощенный запуск прелоадера
         window.addEventListener('load', function() {
             const preloader = document.getElementById('preloader');
             const gradientVideo = document.getElementById('gradientVideo');
             
-            // Показываем прелоадер с fade-in
-            setTimeout(() => {
-                preloader.classList.add('visible');
-            }, 10);
+            // Показываем прелоадер сразу
+            preloader.classList.add('active');
             
-            // Запускаем видео
-            gradientVideo.play().catch(function(error) {
-                console.log("Автозапуск видео прелоадера заблокирован:", error);
-                // Все равно продолжаем
-                startContentLoading();
+            // Пытаемся запустить видео
+            const playVideo = () => {
+                gradientVideo.play().then(() => {
+                    console.log("Видео прелоадера запущено");
+                }).catch(error => {
+                    console.log("Видео прелоадера не запустилось:", error);
+                    // В любом случае продолжаем загрузку
+                    setTimeout(startContentLoading, 1000);
+                });
+            };
+            
+            // Ждем когда видео можно будет играть
+            gradientVideo.addEventListener('canplay', function() {
+                playVideo();
+                // Запускаем таймаут на случай если видео все равно не играет
+                setTimeout(() => {
+                    if (gradientVideo.paused) {
+                        startContentLoading();
+                    }
+                }, 2000);
             });
             
-            // Если видео успешно запустилось
-            gradientVideo.addEventListener('playing', function() {
-                startContentLoading();
-            });
+            // Если видео уже готово
+            if (gradientVideo.readyState >= 3) {
+                playVideo();
+            }
             
-            // На всякий случай таймаут
-            setTimeout(startContentLoading, 1000);
+            // Запускаем загрузку контента через 3 секунды максимум
+            setTimeout(startContentLoading, 3000);
         });
         
         function startContentLoading() {
@@ -359,20 +263,16 @@
             function imageLoaded() {
                 loadedImages++;
                 if (loadedImages === totalImages) {
-                    // Все изображения загружены, скрываем прелоадер
+                    // Все изображения загружены
                     setTimeout(function() {
-                        preloader.classList.remove('visible');
+                        preloader.classList.remove('active');
                         preloader.classList.add('hidden');
                         
                         setTimeout(function() {
                             imageContainer.classList.add('loaded');
-                            // Разрешаем прокрутку
-                            document.body.classList.remove('no-scroll');
-                            
-                            // Запускаем систему плавных переходов видео
                             startVideoLoopSystem();
                         }, 300);
-                    }, 500); // Дополнительная задержка для smoothness
+                    }, 500);
                 }
             }
 
@@ -389,20 +289,28 @@
             video1.load();
             video2.load();
             
-            // Если все изображения уже загружены
+            // Если все уже загружено
             if (loadedImages === totalImages) {
                 setTimeout(function() {
-                    preloader.classList.remove('visible');
+                    preloader.classList.remove('active');
                     preloader.classList.add('hidden');
                     setTimeout(function() {
                         imageContainer.classList.add('loaded');
-                        document.body.classList.remove('no-scroll');
                     }, 300);
                 }, 1000);
             }
+            
+            // На всякий случай - гарантированное скрытие прелоадера через 5 секунд
+            setTimeout(function() {
+                if (!preloader.classList.contains('hidden')) {
+                    preloader.classList.remove('active');
+                    preloader.classList.add('hidden');
+                    imageContainer.classList.add('loaded');
+                }
+            }, 5000);
         }
 
-        // Система плавных переходов между лупами видео
+        // Система плавных переходов видео
         function startVideoLoopSystem() {
             const video1 = document.getElementById('video1');
             const video2 = document.getElementById('video2');
@@ -415,11 +323,7 @@
             
             video1.addEventListener('loadedmetadata', function() {
                 videoDuration = video1.duration * 1000;
-                
-                // Запускаем первое видео
                 video1.play().catch(e => console.log("Автозапуск видео заблокирован"));
-                
-                // Запускаем систему перехода
                 startTransitionTimer();
             });
             
@@ -427,17 +331,13 @@
             
             function startTransitionTimer() {
                 const transitionStartTime = videoDuration - transitionDuration;
-                
                 setTimeout(() => {
-                    if (!isTransitioning) {
-                        startTransition();
-                    }
+                    if (!isTransitioning) startTransition();
                 }, Math.max(0, transitionStartTime));
             }
             
             function startTransition() {
                 if (isTransitioning) return;
-                
                 isTransitioning = true;
                 videoTransitionLoader.classList.add('visible');
                 currentVideo.classList.remove('active');
@@ -459,15 +359,11 @@
             }
             
             video1.addEventListener('ended', function() {
-                if (!isTransitioning) {
-                    startTransition();
-                }
+                if (!isTransitioning) startTransition();
             });
             
             video2.addEventListener('ended', function() {
-                if (!isTransitioning) {
-                    startTransition();
-                }
+                if (!isTransitioning) startTransition();
             });
             
             setInterval(() => {
@@ -507,9 +403,6 @@
         }
 
         function navigateToPage(url) {
-            // Блокируем прокрутку во время перехода
-            document.body.classList.add('no-scroll');
-            
             document.body.style.opacity = '0';
             document.body.style.transform = 'translateY(-20px)';
             document.body.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -519,7 +412,7 @@
             }, 500);
         }
 
-        // Тактильная отдача для всех кликабельных картинок
+        // Тактильная отдача
         ['wy-image', 'first-image', 'second-image'].forEach(id => {
             const image = document.getElementById(id);
             if (image) {
@@ -533,7 +426,6 @@
             }
         });
 
-        // Тактильная отдача для видео
         const videoWrapper = document.querySelector('.video-wrapper');
         videoWrapper.addEventListener('touchstart', function() {
             const videoContainer = this.querySelector('.video-container');
@@ -545,19 +437,12 @@
             videoContainer.style.transform = 'translateY(0) scale(1)';
         });
 
-        // Предотвращаем контекстное меню для видео
+        // Предотвращаем контекстное меню
         document.querySelectorAll('video').forEach(video => {
             video.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
                 return false;
             });
-        });
-
-        // Предотвращаем стандартное управление видео
-        document.addEventListener('keydown', function(e) {
-            if (e.target.tagName === 'VIDEO') {
-                e.preventDefault();
-            }
         });
     </script>
 </body>
