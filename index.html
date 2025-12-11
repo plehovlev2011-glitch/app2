@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>5 изображений</title>
     <script>
         if (!localStorage.getItem('hasSeenWelcome')) {
@@ -14,6 +14,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
         
         body {
@@ -58,12 +60,24 @@
             transform: translateY(0);
         }
         
-        .image-container img {
+        .image-container img,
+        .image-container video {
             width: 100%;
             height: auto;
             display: block;
             cursor: pointer;
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            object-fit: cover;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+        
+        .video-wrapper:active video {
+            transform: translateY(4px) scale(0.98);
         }
         
         #wy-image:active {
@@ -78,8 +92,77 @@
             transform: translateY(4px) scale(0.98);
         }
         
-        #third-image:active {
-            transform: translateY(4px) scale(0.98);
+        /* Скрываем все элементы управления видео */
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-panel {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-play-button {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-timeline {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-current-time-display {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-time-remaining-display {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-timeline-container {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-volume-slider {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-mute-button {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-toggle-closed-captions-button {
+            display: none !important;
+        }
+        
+        video::-webkit-media-controls-fullscreen-button {
+            display: none !important;
+        }
+        
+        /* Для Firefox */
+        video::-moz-media-controls {
+            display: none !important;
+        }
+        
+        /* Для всех браузеров */
+        video {
+            -webkit-media-controls: none;
+            -moz-media-controls: none;
+            -ms-media-controls: none;
+            media-controls: none;
+            pointer-events: none;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
         }
     </style>
 </head>
@@ -94,23 +177,33 @@
         <img id="wy-image" src="wY.png" alt="Доставка" onclick="navigateToPage('deliveryActivity.html')">
         <img id="first-image" src="1.png" alt="Изображение 1" onclick="navigateToPage('page2.html')">
         <img id="second-image" src="2.png" alt="Изображение 2" onclick="navigateToPage('new1.html')">
-        <img id="third-image" src="3.gif" alt="Изображение 3" onclick="checkBpageAccess()">
+        
+        <!-- Видео вместо изображения 3 -->
+        <div class="video-wrapper" onclick="checkBpageAccess()">
+            <video id="fo-video" muted loop playsinline preload="auto" autoplay>
+                <source src="fo.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+            <div class="video-overlay"></div>
+        </div>
+        
         <img src="4.png" alt="Изображение 4">
         <img src="5.png" alt="Изображение 5">
     </div>
 
     <script>
-        // Ждем загрузки всех изображений
+        // Ждем загрузки всех изображений и видео
         window.addEventListener('load', function() {
             const images = document.querySelectorAll('.image-container img');
-            const totalImages = images.length;
-            let loadedImages = 0;
+            const video = document.getElementById('fo-video');
+            const totalMedia = images.length + 1; // изображения + видео
+            let loadedMedia = 0;
             const preloader = document.getElementById('preloader');
             const imageContainer = document.getElementById('imageContainer');
 
-            function imageLoaded() {
-                loadedImages++;
-                if (loadedImages === totalImages) {
+            function mediaLoaded() {
+                loadedMedia++;
+                if (loadedMedia === totalMedia) {
                     setTimeout(function() {
                         preloader.classList.add('hidden');
                         imageContainer.classList.add('loaded');
@@ -118,16 +211,37 @@
                 }
             }
 
+            // Проверяем загрузку изображений
             images.forEach(img => {
                 if (img.complete) {
-                    imageLoaded();
+                    mediaLoaded();
                 } else {
-                    img.addEventListener('load', imageLoaded);
-                    img.addEventListener('error', imageLoaded);
+                    img.addEventListener('load', mediaLoaded);
+                    img.addEventListener('error', mediaLoaded);
                 }
             });
 
-            if (loadedImages === totalImages) {
+            // Проверяем загрузку видео
+            if (video.readyState >= 3) { // HAVE_FUTURE_DATA или больше
+                mediaLoaded();
+            } else {
+                video.addEventListener('canplaythrough', mediaLoaded);
+                video.addEventListener('error', mediaLoaded);
+                
+                // На всякий случай, если видео не загрузится
+                setTimeout(mediaLoaded, 3000);
+            }
+
+            // Запускаем видео
+            video.play().catch(function(error) {
+                console.log("Автозапуск видео заблокирован:", error);
+                // Показываем контент даже если видео не запустилось
+                if (loadedMedia < totalMedia) {
+                    mediaLoaded();
+                }
+            });
+
+            if (loadedMedia === totalMedia) {
                 setTimeout(function() {
                     preloader.classList.add('hidden');
                     imageContainer.classList.add('loaded');
@@ -137,27 +251,24 @@
 
         // Функция проверки доступа к bpage.html
         function checkBpageAccess() {
-            // Проверяем, прошел ли пользователь слайдер
-            const hasPassedSlider = localStorage.getItem('hasPassedSlider') === 'true';
+            // Добавляем тактильную отдачу для видео
+            const videoWrapper = document.querySelector('.video-wrapper');
+            videoWrapper.style.transform = 'translateY(4px) scale(0.98)';
+            setTimeout(() => {
+                videoWrapper.style.transform = 'translateY(0) scale(1)';
+            }, 200);
             
-            // Проверяем, пытался ли пользователь уже зайти на bpage
+            const hasPassedSlider = localStorage.getItem('hasPassedSlider') === 'true';
             const hasTriedBpage = localStorage.getItem('hasTriedBpage') === 'true';
             
-            // Если НЕ прошел слайдер ИЛИ НЕ пытался еще зайти
             if (!hasPassedSlider && !hasTriedBpage) {
-                // Сохраняем, что пользователь пытался зайти
                 localStorage.setItem('hasTriedBpage', 'true');
-                // Отправляем на prebpage.html
                 navigateToPage('prebpage.html');
             } 
-            // Если прошел слайдер
             else if (hasPassedSlider) {
-                // Прямой доступ к bpage.html
                 navigateToPage('bpage.html');
             }
-            // Если пытался зайти, но не прошел слайдер
             else if (hasTriedBpage && !hasPassedSlider) {
-                // Снова отправляем на prebpage.html
                 navigateToPage('prebpage.html');
             }
         }
@@ -173,7 +284,7 @@
         }
 
         // Тактильная отдача для всех кликабельных картинок
-        ['wy-image', 'first-image', 'second-image', 'third-image'].forEach(id => {
+        ['wy-image', 'first-image', 'second-image'].forEach(id => {
             const image = document.getElementById(id);
             if (image) {
                 image.addEventListener('touchstart', function() {
@@ -183,6 +294,48 @@
                 image.addEventListener('touchend', function() {
                     this.style.transform = 'translateY(0) scale(1)';
                 });
+            }
+        });
+
+        // Тактильная отдача для видео
+        const videoWrapper = document.querySelector('.video-wrapper');
+        videoWrapper.addEventListener('touchstart', function() {
+            const video = this.querySelector('video');
+            video.style.transform = 'translateY(4px) scale(0.98)';
+        });
+        
+        videoWrapper.addEventListener('touchend', function() {
+            const video = this.querySelector('video');
+            video.style.transform = 'translateY(0) scale(1)';
+        });
+
+        // Предотвращаем контекстное меню для видео
+        document.getElementById('fo-video').addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Предотвращаем стандартное управление видео
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'VIDEO') {
+                e.preventDefault();
+            }
+        });
+
+        // Перезапускаем видео если оно остановилось
+        const videoElement = document.getElementById('fo-video');
+        
+        // Проверяем каждые 5 секунд, играет ли видео
+        setInterval(function() {
+            if (videoElement.paused && document.visibilityState === 'visible') {
+                videoElement.play().catch(e => console.log("Видео не удалось перезапустить"));
+            }
+        }, 5000);
+
+        // Перезапускаем видео когда страница становится видимой
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && videoElement.paused) {
+                videoElement.play().catch(e => console.log("Видео не удалось перезапустить"));
             }
         });
     </script>
