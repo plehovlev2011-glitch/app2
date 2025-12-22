@@ -13,25 +13,15 @@
         
         body {
             background-color: #000;
-            display: flex;
-            flex-wrap: wrap;
             width: 100vw;
             height: 100vh;
             overflow: hidden;
         }
         
-        .image-container {
-            width: 33.333vw;
-            height: 50vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
         img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            width: 100vw;
+            height: 16.666vh;
+            object-fit: cover;
             display: block;
             cursor: pointer;
         }
@@ -47,28 +37,11 @@
     </script>
 </head>
 <body>
-    <div class="image-container">
-        <img src="1eui.png" alt="Launcher" onclick="navigateToIntent('intent://com.gogo.launcher/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
-    </div>
-    
-    <div class="image-container">
-        <img src="2eui.png" alt="FoodFox" onclick="navigateToIntent('intent://ru.foodfox.vendor/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
-    </div>
-    
-    <div class="image-container">
-        <img src="3eui.png" alt="Mail" onclick="navigateToIntent('intent://ru.mail.mailapp/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
-    </div>
-    
-    <div class="image-container">
-        <img src="4eui.png" alt="Telegram" onclick="navigateToIntent('intent://org.telegram.messenger/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
-    </div>
-    
-    <div class="image-container">
-        <img src="5eui.png" alt="Emergency" onclick="makeCall('112')" onerror="this.style.display='none'">
-    </div>
-    
-    <div class="image-container">
-        <img src="6eui.png" alt="Placeholder" onerror="this.style.display='none'">
-    </div>
+    <img src="1eui.png" alt="Launcher" onclick="navigateToIntent('intent://com.gogo.launcher/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
+    <img src="2eui.png" alt="FoodFox" onclick="navigateToIntent('intent://ru.foodfox.vendor/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
+    <img src="3eui.png" alt="Mail" onclick="navigateToIntent('intent://ru.mail.mailapp/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
+    <img src="4eui.png" alt="Telegram" onclick="navigateToIntent('intent://org.telegram.messenger/#Intent;scheme=android-app;end')" onerror="this.style.display='none'">
+    <img src="5eui.png" alt="Emergency" onclick="makeCall('112')" onerror="this.style.display='none'">
+    <img src="6eui.png" alt="Placeholder" onerror="this.style.display='none'">
 </body>
 </html>
