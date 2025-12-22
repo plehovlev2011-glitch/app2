@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ПЕРЕЦ EUI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000;
+            display: flex;
+            flex-wrap: wrap;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .image-container {
+            width: 33.333vw;
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+        }
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <a href="intent://com.gogo.launcher/#Intent;scheme=android-app;end" class="image-link">
+            <img src="1eui.png" alt="Launcher" onerror="this.style.display='none'">
+        </a>
+    </div>
+    
+    <div class="image-container">
+        <a href="intent://ru.foodfox.vendor/#Intent;scheme=android-app;end" class="image-link">
+            <img src="2eui.png" alt="FoodFox" onerror="this.style.display='none'">
+        </a>
+    </div>
+    
+    <div class="image-container">
+        <a href="intent://ru.mail.mailapp/#Intent;scheme=android-app;end" class="image-link">
+            <img src="3eui.png" alt="Mail" onerror="this.style.display='none'">
+        </a>
+    </div>
+    
+    <div class="image-container">
+        <a href="intent://org.telegram.messenger/#Intent;scheme=android-app;end" class="image-link">
+            <img src="4eui.png" alt="Telegram" onerror="this.style.display='none'">
+        </a>
+    </div>
+    
+    <div class="image-container">
+        <a href="tel:112" class="image-link">
+            <img src="5eui.png" alt="Emergency" onerror="this.style.display='none'">
+        </a>
+    </div>
+    
+    <div class="image-container">
+        <a href="#" class="image-link">
+            <img src="6eui.png" alt="Placeholder" onerror="this.style.display='none'">
+        </a>
+    </div>
+</body>
+</html>
